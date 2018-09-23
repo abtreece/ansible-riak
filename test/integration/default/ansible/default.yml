@@ -1,10 +1,9 @@
 ---
-- hosts: riak-test
-  connection: local
-  become: true
-  become_method: sudo
+- hosts: all
+  gather_facts: true
+
   roles:
-    - ansible-riak
+    - role: ansible-riak
   vars:
     riak_node_name: "riak@127.0.0.1"
     riak_pb_bind_ip: 127.0.0.1

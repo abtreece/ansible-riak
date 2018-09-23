@@ -7,28 +7,20 @@ dist: trusty
 
 addons:
   hosts:
-    - riak-test
+    - riak.test
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq python-apt
 
 install:
-  - sudo apt-get install -y software-properties-common python-software-properties
-  - sudo add-apt-repository -y ppa:ansible/ansible
-  - sudo apt-get update -y
-  - sudo apt-get install -y ansible
-  - echo 'riak-test' | sudo tee -a /etc/ansible/hosts
-
-  # Check ansible version
-  - ansible --version
-
-  # Create ansible.cfg with correct roles_path
-  - 'printf "[defaults]\nroles_path=../" > ansible.cfg'
-
-env:
-  - ANSIBLE_HOST_KEY_CHECKING=False
+  - pip install ansible==2.4
+  - gem install inspec
 
 script:
-  - ansible-playbook tests/test.yml -v
+  - ansible-playbook test/integration/default/default.yml -v
 
-notifications:
-  webhooks: https://galaxy.ansible.com/api/v1/notifications/
-  slack:
-    secure: ZtgcjTxhTxrzWW6MIHLRtucW/BMm42RKS3nGRtSfgER9rx7oJ0Y9gOYkh1FM0GsM7Z11Q/iDhWs/8WTccAV0PrMZ6KHaq54wGmfYyqwPM4YreUwQ87PnOW4wZbl0TJTeWutasEwZvnVJ8VEyyQcS2PHt0zlsENn0XWvobvaZ+FM=
+script:
+  - ansible-playbook test/integration/default/ansible/default.yml --syntax-check
+  - ansible-playbook test/integration/default/ansible/default.yml --connection=local --sudo
+  - inspec exec test/integration/default/inspec/default.rb

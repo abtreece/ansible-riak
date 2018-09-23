@@ -1,57 +1,50 @@
 ---
 - name: Install Pre-requisites
-  package: name={{ item }} state=present update_cache=yes cache_valid_time=3600
-  tags: Debian
+  package:
+    name: "{{ item }}"
+    state: present
   with_items:
-  - curl
-  - apt-transport-https
+    - curl
+    - apt-transport-https
 
 - name: Install JRE
-  package: name={{ riak_java_package }} state=present update_cache=yes cache_valid_time=3600
-  tags: Debian
-  when: 'riak_install_java and riak_java_package is defined'
-
-- name: Install JRE
-  package: name=default-jre state=present update_cache=yes cache_valid_time=3600
+  package:
+    name: default-jre
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
   tags: Debian
   when: 'riak_install_java and riak_java_package is undefined'
 
-- name: Check if Riak is installed
-  stat: path=/etc/riak/riak.conf
-  register: dist
+- name: Add packagecloud key
+  apt_key:
+    url: https://packagecloud.io/erlang-solutions/riak/gpgkey
+    state: present
 
-- name: Add Package Cloud repository key without validation
-  apt_key: url=https://packagecloud.io/gpg.key state=present validate_certs=no
+- name: Add packagecloud repository
+  apt_repository:
+    repo: deb https://packagecloud.io/erlang-solutions/riak/ubuntu/ trusty main
+    state: present
   tags: Debian
-  when:
-    - not dist.stat.exists
-    - riak_install_package_cloud
 
-- name: Add Basho Riak repository (hosted at Package Cloud)
-  template: src=deb_repo.list.j2 dest=/etc/apt/sources.list.d/basho_riak.list owner=root group=root mode=0644
-  when:
-    - not dist.stat.exists
-    - riak_install_package_cloud
-
-- name: Install Riak for Debian
-  package: "name={{ riak_package }} state=present update_cache=yes"
-  tags: Debian
-  when: "'deb' not in riak_package"
-
-- name: Install Riak for Debian
-  apt: "deb={{ riak_package }}"
-  tags: Debian
-  when:
-    - "'deb' in riak_package"
-    - not dist.stat.exists
+- name: Install Riak
+  package:
+    name: riak
+    state: latest
 
 - name: Set the riak ulimit for Debian
-  copy: src=etc_security_limits.d_riak.conf dest=/etc/security/limits.d/riak.conf
+  copy:
+    src: etc_security_limits.d_riak.conf
+    dest: /etc/security/limits.d/riak.conf
   tags: Debian
   when: 'ansible_os_family == "Debian"'
 
 - name: Set the riak ulimit for Ubuntu Trusty
-  copy: src=etc_default_riak_ulimit dest=/etc/default/riak owner=riak group=riak
+  copy:
+    src: etc_default_riak_ulimit
+    dest: /etc/default/riak
+    owner: riak
+    group: riak
   tags: Debian
   when: 'ansible_distribution_release != "xenial" and ansible_distribution_release != "jessie"'
 

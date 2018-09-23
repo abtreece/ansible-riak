@@ -8,11 +8,21 @@
   when: ansible_os_family == 'Debian'
 
 - name: mount the riak volume with optmized settings
-  mount: name={{ riak_mountpoint }} src={{ riak_partition }} opts="{{riak_mount_options}}" fstype="{{riak_filesystem}}" state=mounted
+  mount:
+    name: "{{ riak_mountpoint }}"
+    src: "{{ riak_partition }}"
+    opts: "{{riak_mount_options}}"
+    fstype: "{{riak_filesystem}}"
+    state: mounted
   when: riak_tune_disks
 
 - name: create script with disk tuning commands
-  template: src=riak_disk_tune.sh.j2 dest=/usr/local/bin/riak_disk_tune.sh owner=root group=root mode=0755
+  template:
+    src: riak_disk_tune.sh.j2
+    dest: /usr/local/bin/riak_disk_tune.sh
+    owner: root
+    group: root
+    mode: 0755
   notify: run riak_disk_tune
   when: riak_tune_disks
 
@@ -24,25 +34,50 @@
   file: dest=/etc/sysctl.d state=directory
 
 - name: configure sysctl
-  template: src=etc_sysctl.d_riak.conf.j2 dest=/etc/sysctl.d/riak.conf owner=root group=root mode=0644
+  template:
+    src: etc_sysctl.d_riak.conf.j2
+    dest: /etc/sysctl.d/riak.conf
+    owner: root
+    group: root
+    mode: 0644
 
 - name: copy custom beams
   synchronize: "src={{ riak_custom_beams_dir }} dest={{ riak_patch_dir }}"
   when: riak_custom_beams_dir is defined
 
 - name: install riak.conf with templated configuration
-  template: "src={{ riak_conf_template }} dest=/etc/riak/riak.conf owner=root group=root mode=0444 backup=yes"
+  template:
+    src: "{{ riak_conf_template }}"
+    dest: /etc/riak/riak.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
 
 - name: install advanced.config if template is defined
-  template: "src={{ riak_advanced_config_template }} dest=/etc/riak/advanced.config owner=root group=root mode=0444 backup=yes"
+  template:
+    src: "{{ riak_advanced_config_template }}"
+    dest: /etc/riak/advanced.config
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
   when: riak_advanced_config_template is defined
 
 - name: install riak_shell.config with templated configuration
-  template: "src={{ riak_shell_conf_template }} dest=/etc/riak/riak_shell.config owner=root group=root mode=0444"
+  template:
+    src: "{{ riak_shell_conf_template }}"
+    dest: /etc/riak/riak_shell.config
+    owner: root
+    group: root
+    mode: 0644
   when: riak_package == "riak-ts" and riak_shell_nodes is defined
 
 - name: Reboot Riak to accept the new config and ensure it is enabled to start at bootup
-  service: name=riak enabled=yes state=restarted
+  service:
+    name: riak
+    enabled: yes
+    state: restarted
   when: riak_init_system == 'system'
 
 - name: Wait for Riak to start up before continuing

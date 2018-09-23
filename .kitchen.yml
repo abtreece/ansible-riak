@@ -1,0 +1,29 @@
+---
+driver:
+  name: docker
+  use_sudo: false
+  privileged: true
+
+provisioner:
+  name: ansible_playbook
+  hosts: all
+  require_chef_for_busser: false
+  idempotency_test: false
+  role_name: ansible-riak
+  roles_path: .
+
+platforms:
+  - name: ubuntu-14.04
+    driver_config:
+      hostname: riak.test
+  - name: centos-6
+    driver_config:
+      hostname: riak.test
+
+suites:
+  - name: default
+    run_list:
+    attributes:
+
+verifier:
+  name: inspec
