@@ -17,6 +17,10 @@ install:
   - pip install ansible==2.4
   - gem install inspec
 
+  - sudo mkdir -p /etc/ansible
+  - sudo touch /etc/ansible/hosts
+  - "echo -e '[local]\nlocalhost ansible_connection=local' | sudo tee -a /etc/ansible/hosts > /dev/null"
+
 script:
   - ansible-playbook test/integration/default/ansible/default.yml --syntax-check
   - ansible-playbook test/integration/default/ansible/default.yml --connection=local --sudo
