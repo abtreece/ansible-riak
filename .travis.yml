@@ -3,26 +3,15 @@ language: python
 python: "2.7"
 
 sudo: required
-
-matrix:
-  include:
-  - os: ubuntu
-    dist: trusty
-  - os: centos
-    version: 6
+dist: trusty
 
 addons:
   hosts:
     - riak.test
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "ubuntu" ]]; then
-      sudo apt-get update -qq
-      sudo apt-get install -qq python-apt
-    fi
-  - if [[ "$TRAVIS_OS_NAME" == "centos" ]]; then
-      sudo yum install python-pip rubygems
-    fi
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq python-apt
 
 install:
   - pip install ansible==2.4
