@@ -52,6 +52,9 @@ control 'riak-service-1.1' do
   title 'Ensure riak service is running'
   desc 'Ensure riak service is running'
 
+  # riak does not play well with containers
+  only_if { virtualization.system != 'docker' }
+
   describe service('riak') do
     it { should be_running }
   end

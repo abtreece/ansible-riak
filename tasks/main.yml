@@ -84,7 +84,7 @@
   wait_for: "delay=5 timeout=30 host={{ riak_pb_bind_ip }} port={{ riak_pb_port }} state=started"
 
 - name: Bucket operations
-  include: buckets.yml
+  import_tasks: buckets.yml
 
 - name: Security operations
-  include: security.yml
+  import_tasks: security.yml

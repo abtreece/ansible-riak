@@ -49,7 +49,10 @@
   when: 'ansible_distribution_release != "xenial" and ansible_distribution_release != "jessie"'
 
 - name: Set the riak ulimit for Ubuntu Xenial
-  lineinfile: 'dest=/lib/systemd/system/riak.service line="LimitNOFILE=131072" insertafter="^RuntimeDirectory=riak"'
+  lineinfile:
+    dest: /lib/systemd/system/riak.service
+    line: "LimitNOFILE=131072"
+    insertafter: "^RuntimeDirectory=riak"
   tags: Debian
   when: 'ansible_distribution_release == "xenial" or ansible_distribution_release == "jessie"'
 
