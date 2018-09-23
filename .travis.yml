@@ -18,9 +18,6 @@ install:
   - gem install inspec
 
 script:
-  - ansible-playbook test/integration/default/default.yml -v
-
-script:
   - ansible-playbook test/integration/default/ansible/default.yml --syntax-check
   - ansible-playbook test/integration/default/ansible/default.yml --connection=local --sudo
   - inspec exec test/integration/default/inspec/default.rb

@@ -10,7 +10,6 @@ provisioner:
   require_chef_for_busser: false
   idempotency_test: false
   role_name: ansible-riak
-  roles_path: .
 
 platforms:
   - name: ubuntu-14.04
